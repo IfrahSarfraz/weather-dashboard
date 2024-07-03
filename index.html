@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather dashboard</title>
+    <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            border: none;
+            outline: none;
+            font-family: sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('bg.jpg'); background-size: cover;
+        }
+
+        .container {
+            width: 400px;
+            height: min-content;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 28px;
+        }
+
+        .search-box {
+            width: 100%;
+            height: min-content;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box input {
+            width: 84%;
+            font-size: 20px;
+            text-transform: capitalize;
+            color: #000;
+            background-color: #e6f5fb;
+            padding: 12px 16px;
+            border-radius: 14px;
+        }
+
+        .search-box input::placeholder {
+            color: #000;
+        }
+
+        .search-box button {
+            width: 46px;
+            height: 46px;
+            background-color: #e6f5fb;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .search-box button:hover {
+            color: #fff;
+            background-color: #ababab;
+        }
+
+        .weather-body img {
+            width: 60%;
+        }
+
+        .weather-body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-block: 20px;
+        }
+
+        .weather-box {
+            margin-block: 20px;
+            text-align: center;
+        }
+
+        .weather-box .temperature {
+            font-size: 40px;
+            font-weight: 800;
+            position: relative;
+        }
+
+        .weather-box .temperature sup {
+            position: absolute;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .weather-box .description {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        .weather-details {
+            width: 100%;
+            margin-top: 30px;
+            justify-content: space-between;
+            display: flex;
+        }
+
+        .humidity, .wind {
+            display: flex;
+            align-items: center;
+        }
+
+        .humidity {
+            margin-left: 20px;
+        }
+
+        .wind {
+            margin-right: 20px;
+        }
+
+        .weather-details i {
+            font-size: 36px;
+        }
+
+        .weather-details .text {
+            margin-left: 10px;
+            font-size: 16px;
+        }
+
+        .text span {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .loading {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="search-box">
+                <input
+                    type="text"
+                    placeholder="Enter  location"
+                    class="input-box"
+                />
+                <button id="searchBtn"><i class='bx bx-search'></i></button>
+            </div>
+            <div class="weather-body">
+                <img src="cloud.png" alt="Weather Image" class="weather-img" />
+                <img src="404.png" alt="Error Image" class="error-img" style="display: none;" />
+                <div class="weather-box">
+                    <p class="temperature">0<sup>°C</sup></p>
+                    <p class="description">Light Rain</p>
+                </div>
+                <div class="weather-details">
+                    <div class="humidity">
+                        <i class="fa-solid fa-droplet"></i>
+                        <div class="text">
+                            <span id="humidity">45%</span>
+                            <p>Humidity</p>
+                        </div>
+                    </div>
+                    <div class="wind">
+                        <i class="fa-solid fa-wind"></i>
+                        <div class="text">
+                            <span id="wind-speed">12 Km/h</span>
+                            <p>Wind Speed</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="error-message" style="display: none;">Location not found. Please try again.</p>
+                <p class="loading" style="display: none;">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const input_Box = document.querySelector(".input-box");
+        const search_Btn = document.querySelector("#searchBtn");
+        const temperature = document.querySelector(".temperature");
+        const Humidity = document.querySelector("#humidity");
+        const Description = document.querySelector(".description");
+        const wind_Speed = document.querySelector("#wind-speed");
+        const Image = document.querySelector(".weather-img");
+        const errorMessage = document.querySelector(".error-message");
+        const errorImage = document.querySelector(".error-img");
+        const loadingMessage = document.querySelector(".loading");
+
+        search_Btn.addEventListener("click", () => {
+            updateWeatherByCity(input_Box.value);
+        });
+
+        const updateWeatherByCity = async (city) => {
+            const api_key = "7f09b2c210187b5b1e0733298f268321";
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${api_key}`;
+            fetchWeather(url);
+        };
+
+        const fetchWeather = async (url) => {
+            try {
+                showLoading(true);
+                const response = await fetch(url);
+                const weather_data = await response.json();
+
+                if (response.status === 404) {
+                    throw new Error("Location not found");
+                }
+
+                temperature.innerHTML = `${Math.round(weather_data.main.temp - 273.15)}°C`;
+wind_Speed.innerHTML = `${weather_data.wind.speed} Km/h`;
+Humidity.innerText = `${weather_data.main.humidity}%`;
+Description.innerText = `${weather_data.weather[0].description}`;
+
+
+
+                errorMessage.style.display = "none";
+                errorImage.style.display = "none";
+                Image.style.display = "block";
+
+                switch (weather_data.weather[0].main) {
+                    case "Clear":
+                        Image.src = "clear.png";
+                        break;
+                    case "Clouds":
+                        if (weather_data.weather[0].description === "overcast clouds") {
+                            Image.src = "overcast.png"; // Make sure you have this image
+                        } else {
+                            Image.src = "cloud.png";
+                        }
+                        break;
+                    case "Rain":
+                        Image.src = "rain.png";
+                        break;
+                    case "Mist":
+                        Image.src = "mist.png";
+                        break;
+                    case "Snow":
+                        Image.src = "snow.png";
+                        break;
+                    default:
+                        console.log("No image available");
+                        break;
+                }
+            } catch (error) {
+                console.error(error.message);
+                errorMessage.style.display = "block";
+                errorImage.style.display = "block";
+                Image.style.display = "none";
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        const showLoading = (isLoading) => {
+            loadingMessage.style.display = isLoading ? "block" : "none";
+        };
+
+        const getLocationWeather = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
+                    const api_key = "7f09b2c210187b5b1e0733298f268321";
+                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${api_key}`;
+                    fetchWeather(url);
+                }, error => {
+                    console.error(error);
+                    errorMessage.style.display = "block";
+                    errorMessage.textContent = "Unable to retrieve location. Please try again.";
+                });
+            } else {
+                errorMessage.style.display = "block";
+                errorMessage.textContent = "Geolocation is not supported by this browser.";
+            }
+        };
+
+        window.onload = getLocationWeather;
+        
+    </script>
+</body>
+</html>
