@@ -21,7 +21,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: url('bg.jpg'); background-size: cover;
+            background-image: url('images/bg.jpg'); background-size: cover;
         }
 
         .container {
@@ -236,23 +236,23 @@ Description.innerText = `${weather_data.weather[0].description}`;
 
                 switch (weather_data.weather[0].main) {
                     case "Clear":
-                        Image.src = "clear.png";
+                        Image.src = "images/clear.png";
                         break;
                     case "Clouds":
                         if (weather_data.weather[0].description === "overcast clouds") {
-                            Image.src = "overcast.png"; // Make sure you have this image
+                            Image.src = "images/overcast.png"; 
                         } else {
-                            Image.src = "cloud.png";
+                            Image.src = "images/cloud.png";
                         }
                         break;
                     case "Rain":
-                        Image.src = "rain.png";
+                        Image.src = "images/rain.png";
                         break;
                     case "Mist":
-                        Image.src = "mist.png";
+                        Image.src = "images/mist.png";
                         break;
                     case "Snow":
-                        Image.src = "snow.png";
+                        Image.src = "images/snow.png";
                         break;
                     default:
                         console.log("No image available");
