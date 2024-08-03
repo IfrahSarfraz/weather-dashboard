@@ -16,7 +16,8 @@ Website image
 ![website img](https://github.com/user-attachments/assets/4ba31f83-5148-4074-b682-eca6e34f5171)
 
 ## Demo
-Check out the live demo [here] (https://ifrahsarfraz.github.io/weather-dashboard/).
+
+Check out the live demo [here](https://ifrahsarfraz.github.io/weather-dashboard/).
 
 ## Usage
 
